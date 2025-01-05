@@ -1,0 +1,30 @@
+version: '3.8'
+
+services:
+  laravel:
+    build:
+      context: ./laravel  
+      dockerfile: Dockerfile  
+    container_name: laravel
+    working_dir: /app
+    volumes:
+      - ./laravel/laravel-app:/app  
+    ports:
+      - "8000:8000"  
+    command: bash -c "[[ ! -f artisan ]] && composer create-project laravel/laravel . || php artisan serve --host=0.0.0.0"  # Arrancar Laravel si no está inicializado
+    depends_on:
+      - mariadb  # Asegurarse de que MariaDB esté disponible antes de iniciar Laravel
+
+  mariadb:
+    build:
+      context: ./mariadb  
+      dockerfile: Dockerfile  
+    container_name: mariadb-server
+    environment:
+      MYSQL_ROOT_PASSWORD: m1_s3cr3t
+      MYSQL_DATABASE: test1  # Base de datos por defecto
+    ports:
+      - "3306:3306"  
+    volumes:
+      - ./mariadb/data:/var/lib/mysql  # Mapea la carpeta de datos 'mariadb/data' para persistir los datos de la base de datos
+
